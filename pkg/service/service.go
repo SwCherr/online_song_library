@@ -7,8 +7,11 @@ import (
 
 type Authorization interface {
 	CreateUser(user app.User) (int, error)
-	GetPareToken(session app.Sesion) (acces, refresh string, err error)
-	RefreshToken(session app.Sesion) (acces, refresh string, err error)
+	// GetAllData(c *gin.Context)
+	// GetSong(c *gin.Context)
+	// DeleteSong(c *gin.Context)
+	// UpdateSong(c *gin.Context)
+	// PostNewSong(c *gin.Context)
 }
 
 type Service struct {

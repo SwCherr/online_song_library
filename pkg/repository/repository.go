@@ -8,9 +8,6 @@ import (
 
 type Authorization interface {
 	CreateUser(user app.User) (int, error)
-	GetUserById(id int) (app.User, error)
-	PullOutSessionByGUID(fingerprint string) (app.Sesion, error)
-	CreateSession(session app.Sesion) error
 }
 
 type Repository struct {

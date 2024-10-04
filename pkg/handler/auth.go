@@ -26,42 +26,22 @@ func (h *Handler) SignUp(c *gin.Context) {
 	})
 }
 
-func (h *Handler) GetPareTokens(c *gin.Context) {
-	var input app.Sesion
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
-		return
-	}
+func (h *Handler) GetAllData(c *gin.Context) {
 
-	input.UserIP = c.ClientIP()
-	newAccessToken, newRefreshToken, err := h.service.GetPareToken(input)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"accessToken":  newAccessToken,
-		"refreshToken": newRefreshToken,
-	})
 }
 
-func (h *Handler) RefreshToken(c *gin.Context) {
-	var input app.Sesion
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
-		return
-	}
+func (h *Handler) GetSong(c *gin.Context) {
 
-	input.UserIP = c.ClientIP()
-	newAccessToken, newRefreshToken, err := h.service.RefreshToken(input)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
+}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"accessToken":  newAccessToken,
-		"refreshToken": newRefreshToken,
-	})
+func (h *Handler) DeleteSong(c *gin.Context) {
+
+}
+
+func (h *Handler) UpdateSong(c *gin.Context) {
+
+}
+
+func (h *Handler) PostNewSong(c *gin.Context) {
+
 }
