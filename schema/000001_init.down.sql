@@ -1,3 +1,1 @@
-DROP TABLE refresh_sessions;
-
-DROP TABLE users;
+DROP TABLE IF EXISTS songs;

@@ -18,11 +18,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	auth := router.Group("/api")
 	{
-		auth.GET("/signup", h.GetAllData)
-		auth.GET("/signup", h.GetSong)
-		auth.DELETE("/signup", h.DeleteSong)
-		auth.PATCH("/signup", h.UpdateSong)
-		auth.POST("/signup", h.PostNewSong)
+		auth.GET("/songs", h.GetAllData)
+		auth.GET("/song", h.GetSong)
+		auth.DELETE("/song", h.DeleteSong)
+		auth.PATCH("/song", h.UpdateSong)
+		auth.POST("/song", h.PostNewSong)
 	}
 	return router
 }

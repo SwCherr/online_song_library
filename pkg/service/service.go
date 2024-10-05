@@ -6,12 +6,11 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user app.User) (int, error)
-	// GetAllData(c *gin.Context)
-	// GetSong(c *gin.Context)
-	// DeleteSong(c *gin.Context)
-	// UpdateSong(c *gin.Context)
-	// PostNewSong(c *gin.Context)
+	// GetAllData(song app.Song) (int, error)
+	// GetSong(song app.Song) (int, error)
+	DeleteSong(song app.Song) error
+	UpdateSong(song app.Song) (int, error)
+	PostNewSong(song app.Song) (int, error)
 }
 
 type Service struct {

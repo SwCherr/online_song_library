@@ -1,16 +1,18 @@
 package app
 
-type User struct {
-	ID       int    `json:"-" db:"id"`
-	Email    string `json:"email" db:"email" binding:"required"`
-	Password string `json:"password" db:"password" binding:"required"`
+type Song struct {
+	Info
+	Detail
 }
 
-type Sesion struct {
-	ID           int    `json:"-" db:"id"`
-	UserIP       string `json:"-" db:"ip"`
-	UserID       int    `json:"id" db:"user_id" binding:"required"`
-	GUID         string `json:"guid" db:"guid" binding:"required"`
-	RefreshToken string `json:"refreshToken" db:"refresh_token"`
-	ExpiresIn    int64  `json:"-" db:"expires_in"`
+type Info struct {
+	Id    int    `json:"id" db:"id"`
+	Group string `json:"group" db:"group_name" binding:"required"`
+	Song  string `json:"song" db:"song" binding:"required"`
+}
+
+type Detail struct {
+	ReleaseDate string `json:"releaseDate" db:"release_date" binding:"required"`
+	Text        string `json:"text" db:"text" binding:"required"`
+	Link        string `json:"link" db:"link" binding:"required"`
 }

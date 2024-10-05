@@ -3,8 +3,6 @@ package service
 import (
 	"app"
 	"app/pkg/repository"
-	"crypto/sha1"
-	"fmt"
 	"time"
 )
 
@@ -23,13 +21,28 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user app.User) (int, error) {
-	user.Password = s.generateHash(user.Password)
-	return s.repo.CreateUser(user)
+func (s *AuthService) DeleteSong(song app.Song) error {
+	return s.repo.DeleteSong(song)
 }
 
-func (s *AuthService) generateHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+func (s *AuthService) UpdateSong(song app.Song) (int, error) {
+	return s.repo.UpdateSong(song)
 }
+
+func (s *AuthService) PostNewSong(song app.Song) (int, error) {
+	return s.repo.PostNewSong(song)
+}
+
+// func (s *AuthService) PostNewSong(song app.Song) (int, error) {
+// 	return s.repo.PostNewSong(song)
+// }
+
+// func (s *AuthService) PostNewSong(song app.Song) (int, error) {
+// 	return s.repo.PostNewSong(song)
+// }
+
+// func (s *AuthService) generateHash(password string) string {
+// 	hash := sha1.New()
+// 	hash.Write([]byte(password))
+// 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+// }

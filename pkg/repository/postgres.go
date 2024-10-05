@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	userTable    = "users"
-	sessionTable = "refresh_sessions"
+	songTable = "songs"
 )
 
 type Config struct {
