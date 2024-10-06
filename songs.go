@@ -7,12 +7,12 @@ type Song struct {
 
 type Info struct {
 	Id    int    `json:"id" db:"id"`
-	Group string `json:"group" db:"group_name" binding:"required"`
-	Song  string `json:"song" db:"song" binding:"required"`
+	Group string `json:"group" db:"group_name"`
+	Song  string `json:"song" db:"song"`
 }
 
 type Detail struct {
-	ReleaseDate string `json:"releaseDate" db:"release_date" binding:"required"`
-	Text        string `json:"text" db:"text" binding:"required"`
-	Link        string `json:"link" db:"link" binding:"required"`
+	ReleaseDate string `json:"releaseDate" db:"release_date"`
+	Text        string `json:"text" db:"text"`
+	Link        string `json:"link" db:"link"`
 }

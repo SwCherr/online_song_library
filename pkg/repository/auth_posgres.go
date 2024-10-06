@@ -16,6 +16,31 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 }
 
 // group_name, song, release_date, text, link	var id int
+func (r *AuthPostgres) GetAllData(page int, sizePage int, song app.Song) (app.Song, error) {
+	var info app.Song
+	query := fmt.Sprintf("SELECT * FROM %s "+
+		"WHERE id=$1 AND "+
+		"group_name = COALESCE(NULLIF($2, ''), group_name) AND "+
+		"song = COALESCE(NULLIF($3, ''), song) AND "+
+		"release_date = COALESCE(NULLIF($4, ''), release_date) AND "+
+		"text = COALESCE(NULLIF($5, ''), text) AND "+
+		"link = COALESCE(NULLIF($6, ''), link) ",
+		songTable)
+	if err := r.db.Get(&info, query, song.Id, song.Group, song.Song, song.ReleaseDate, song.Text, song.Link); err != nil {
+		return info, err
+	}
+	return info, nil
+}
+
+func (r *AuthPostgres) GetSong(id int) (string, error) {
+	var text string
+	query := fmt.Sprintf("SELECT text FROM %s WHERE id=$1", songTable)
+	if err := r.db.Get(&text, query, id); err != nil {
+		return "", err
+	}
+	return text, nil
+}
+
 func (r *AuthPostgres) DeleteSong(song app.Song) error {
 	var id int
 	query := fmt.Sprintf("DELETE FROM %s WHERE group_name=$1 AND song=$2 RETURNING id", songTable)
@@ -26,7 +51,6 @@ func (r *AuthPostgres) DeleteSong(song app.Song) error {
 	return nil
 }
 
-// group_name, song, release_date, text, link	var id int
 func (r *AuthPostgres) UpdateSong(song app.Song) (int, error) {
 	var id int
 	query := fmt.Sprintf("UPDATE %s "+

@@ -11,10 +11,61 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type AllInput struct {
+	Page     int `json:"page" binding:"required"`
+	SizePage int `json:"sizePage" binding:"required"`
+	app.Song
+}
+
+type Input struct {
+	ID       int `json:"id" binding:"required"`
+	Page     int `json:"page" binding:"required"`
+	SizePage int `json:"sizePage" binding:"required"`
+}
+
 func (h *Handler) GetAllData(c *gin.Context) {
+	var input AllInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	song, text, err := h.service.GetAllData(input.Page, input.SizePage, input.Song)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"page": input.Page,
+		"song": map[string]interface{}{
+			"id":          song.Id,
+			"group":       song.Group,
+			"song":        song.Song,
+			"releaseDate": song.ReleaseDate,
+			"text":        text,
+			"link":        song.Link,
+		},
+	})
 }
 
 func (h *Handler) GetSong(c *gin.Context) {
+	var input Input
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	couplets, err := h.service.GetSong(input.ID, input.Page, input.SizePage)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"page":     input.Page,
+		"couplets": couplets,
+	})
 }
 
 func (h *Handler) DeleteSong(c *gin.Context) {
