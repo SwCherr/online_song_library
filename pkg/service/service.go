@@ -6,8 +6,8 @@ import (
 )
 
 type Authorization interface {
-	GetAllData(page int, sizePage int, song app.Song) (app.Song, []string, error)
-	GetSong(id int, page int, sizePage int) ([]string, error)
+	GetFilterDataPaginate(page int, sizePage int, song app.Song) ([]app.Song, error)
+	GetTextSongPaginate(id int, page int, sizePage int) ([]string, error)
 	DeleteSong(song app.Song) error
 	UpdateSong(song app.Song) (int, error)
 	PostNewSong(song app.Song) (int, error)

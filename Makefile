@@ -3,7 +3,7 @@ all: clean build mocks test gcov
 # it`s temporary goal
 start: deleteDB createDB run
 
-run:
+run: clean swagInit
 	go run cmd/main.go
 
 # createFileMigration:
@@ -17,9 +17,11 @@ deleteDB:
 	migrate -path ./schema -database "postgres://uliakungurova:qwerty@localhost:5432/online_song_library?sslmode=disable" down || true
 	dropdb -f --if-exists -e online_song_library
 
+swagInit:
+	swag init -g cmd/main.go
 
-
-
+clean:
+	rm -rf docs/
 
 
 # build:

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 
 	"net/http"
 
@@ -12,6 +14,7 @@ import (
 )
 
 type AllInput struct {
+	ID       int `json:"id" binding:"required"`
 	Page     int `json:"page" binding:"required"`
 	SizePage int `json:"sizePage" binding:"required"`
 	app.Song
@@ -23,40 +26,71 @@ type Input struct {
 	SizePage int `json:"sizePage" binding:"required"`
 }
 
-func (h *Handler) GetAllData(c *gin.Context) {
-	var input AllInput
-	if err := c.BindJSON(&input); err != nil {
+// @Summary get Filter Data Paginate
+// @Description Получение всех данных песни с пагинацией по куплетам
+// @Tags songs
+// @Accept  json
+// @Produce  json
+// @Param page query int true "Page number"
+// @Param sizePage query int true "Number of items per page"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid input body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /songs [get]
+func (h *Handler) getFilterDataPaginate(c *gin.Context) {
+	req := c.Request.URL.Query()
+
+	page, err := strconv.Atoi(req.Get("page"))
+	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	song, text, err := h.service.GetAllData(input.Page, input.SizePage, input.Song)
+	sizePage, err := strconv.Atoi(req.Get("sizePage"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	var input app.Song
+	input.Group = req.Get("group")
+	input.Song = req.Get("song")
+	input.Text = req.Get("text")
+	input.Link = req.Get("link")
+	input.ReleaseDate = req.Get("releaseDate")
+
+	songs, err := h.service.GetFilterDataPaginate(page, sizePage, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"page": input.Page,
-		"song": map[string]interface{}{
-			"id":          song.Id,
-			"group":       song.Group,
-			"song":        song.Song,
-			"releaseDate": song.ReleaseDate,
-			"text":        text,
-			"link":        song.Link,
-		},
+		"page":  req["page"],
+		"songs": songs,
 	})
 }
 
-func (h *Handler) GetSong(c *gin.Context) {
+// @Summary get Text Song Paginate
+// @Description Получение текста песни с пагинацией по куплетам
+// @Tags song
+// @Accept  json
+// @Produce  json
+// @Param id query int true "Song ID"
+// @Param page query int true "Page number"
+// @Param sizePage query int true "Number of couplets per page"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid input body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /song [get]
+func (h *Handler) getTextSongPaginate(c *gin.Context) {
 	var input Input
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	couplets, err := h.service.GetSong(input.ID, input.Page, input.SizePage)
+	couplets, err := h.service.GetTextSongPaginate(input.ID, input.Page, input.SizePage)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -68,7 +102,19 @@ func (h *Handler) GetSong(c *gin.Context) {
 	})
 }
 
-func (h *Handler) DeleteSong(c *gin.Context) {
+// @Summary deleteSong
+// @Description Удаление песни по названию группы и песни
+// @Tags song
+// @Accept  json
+// @Produce  json
+// @Param page query int true "Page number"
+// @Param sizePage query int true "Number of items per page"
+// @Param song body app.Song.Info true "Song main information"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid input body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /song [delete]
+func (h *Handler) deleteSong(c *gin.Context) {
 	var song app.Song
 	if err := c.BindJSON(&song.Info); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
@@ -84,7 +130,19 @@ func (h *Handler) DeleteSong(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
-func (h *Handler) UpdateSong(c *gin.Context) {
+// @Summary updateSong
+// @Description Обновление данных песни
+// @Tags song
+// @Accept  json
+// @Produce  json
+// @Param page query int true "Page number"
+// @Param sizePage query int true "Number of items per page"
+// @Param song body app.Song.Info true "Song main information"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid input body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /song [patch]
+func (h *Handler) updateSong(c *gin.Context) {
 	var song app.Song
 	if err := c.BindJSON(&song.Info); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
@@ -102,21 +160,29 @@ func (h *Handler) UpdateSong(c *gin.Context) {
 	})
 }
 
-func (h *Handler) PostNewSong(c *gin.Context) {
+// @Summary postNewSong
+// @Description Добавление новой песни с использованием стороннего API для обогащения данных
+// @Tags song
+// @Accept  json
+// @Produce  json
+// @Param song body app.Song true "New Song Data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string "Invalid input body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /song [post]
+func (h *Handler) postNewSong(c *gin.Context) {
 	var song app.Song
 	if err := c.BindJSON(&song.Info); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	// get full info in SongDetail
 	err := getFullInfo(&song)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// post new song
 	id, err := h.service.PostNewSong(song)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -161,26 +227,26 @@ func requestMockData() ([]byte, error) {
 	return str, nil
 }
 
-// func requestThirdPartyAPI(song *app.Song) ([]byte, error) {
-// 	client, err := app.NewClient()
-// 	if err != nil {
-// 		return []byte{}, err
-// 	}
+func requestThirdPartyAPI(song *app.Song) ([]byte, error) {
+	client, err := app.NewClient()
+	if err != nil {
+		return []byte{}, err
+	}
 
-// 	group := strings.ReplaceAll(song.Info.Group, " ", "+")
-// 	namesong := strings.ReplaceAll(song.Info.Song, " ", "+")
-// 	finalURL := "https://" + client.Host + "/info?group=" + group + "&song=" + namesong
+	group := strings.ReplaceAll(song.Info.Group, " ", "+")
+	namesong := strings.ReplaceAll(song.Info.Song, " ", "+")
+	finalURL := "https://" + client.Host + "/info?group=" + group + "&song=" + namesong
 
-// 	resp, err := http.Get(finalURL)
-// 	if err != nil {
-// 		return []byte{}, err
-// 	}
-// 	defer resp.Body.Close()
+	resp, err := http.Get(finalURL)
+	if err != nil {
+		return []byte{}, err
+	}
+	defer resp.Body.Close()
 
-// 	str, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return []byte{}, err
-// 	}
+	str, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []byte{}, err
+	}
 
-// 	return str, nil
-// }
+	return str, nil
+}

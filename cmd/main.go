@@ -12,6 +12,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @title           Online song library API
+// @version         1.0
+// @description     API server for online song library
+
+// @host      localhost:8000
+// @BasePath  /api
+
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
