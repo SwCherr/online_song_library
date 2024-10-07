@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  postgres: 
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: online_song_library
+  app: 
+    build: .

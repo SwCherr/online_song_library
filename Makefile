@@ -1,27 +1,59 @@
 all: clean build mocks test gcov
 
-# it`s temporary goal
-start: deleteDB createDB run
+# DOCKER
+dockerRun:
+#	docker run -it online_song_library
+	docker run online_song_library-app
 
-run: clean swagInit
-	go run cmd/main.go
+# dockerBuild:
+# 	docker build . -t online_song_library:latest
+
+dockerCompose:
+	docker-compose up
+
+dockerStop:
+	docker-compose down
+
+# APP
+start: createDB run
+
+build:
+	go build cmd/main.go -o app
+
+run:
+	./app
+
+# run: 
+# 	go run cmd/main.go
+
+runSwag: clean swagInit run
 
 # createFileMigration:
 # 	migrate create -ext sql -dir schema -seq init
 
 createDB:
-	createdb online_song_library
-	migrate -path ./schema -database "postgres://uliakungurova:qwerty@localhost:5432/online_song_library?sslmode=disable" up
+#	createdb online_song_library
+	createdb -p 5432 -h postgres -E LATIN1 -e online_song_library
+	migrate -path ./schema -database "postgres://postgres:qwerty@postgres:5432/online_song_library?sslmode=disable" up
+
+# Создать базу demo на сервере eden, порт 5000, с кодировкой LATIN1 можно так:
+# createdb -p 5432 -h postgres -E LATIN1 -e online_song_library
+# createdb -p 5000 -h eden -E LATIN1 -e demo
+
+# CREATE DATABASE demo ENCODING 'LATIN1';
+
 
 deleteDB:
-	migrate -path ./schema -database "postgres://uliakungurova:qwerty@localhost:5432/online_song_library?sslmode=disable" down || true
+	migrate -path ./schema -database "postgres://postgres:qwerty@postgres:5432/online_song_library?sslmode=disable" down || true
 	dropdb -f --if-exists -e online_song_library
 
+# SWAGGER
 swagInit:
 	swag init -g cmd/main.go
 
 clean:
 	rm -rf docs/
+	rm -rf ./app
 
 
 # build:

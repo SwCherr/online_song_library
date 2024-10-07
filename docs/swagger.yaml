@@ -1,0 +1,230 @@
+basePath: /api
+definitions:
+  app.Song:
+    properties:
+      group:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      releaseDate:
+        type: string
+      song:
+        type: string
+      text:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API server for online song library
+  title: Online song library API
+  version: "1.0"
+paths:
+  /song:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление песни по названию группы и песни
+      parameters:
+      - description: id song
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: deleteSong
+      tags:
+      - song
+    get:
+      consumes:
+      - application/json
+      description: Получение текста песни с пагинацией по куплетам
+      parameters:
+      - description: Song ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Number of couplets per page
+        in: query
+        name: sizePage
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: get Text Song Paginate
+      tags:
+      - song
+    patch:
+      consumes:
+      - application/json
+      description: Обновление данных песни
+      parameters:
+      - description: Song information for update
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/app.Song'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: updateSong
+      tags:
+      - song
+    post:
+      consumes:
+      - application/json
+      description: Добавление новой песни с использованием стороннего API для обогащения
+        данных
+      parameters:
+      - description: New Song Data
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/app.Song'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: postNewSong
+      tags:
+      - song
+  /songs:
+    get:
+      consumes:
+      - application/json
+      description: Получение всех данных песни с пагинацией по куплетам
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: sizePage
+        required: true
+        type: integer
+      - description: Song group
+        in: query
+        name: group
+        type: string
+      - description: Song name
+        in: query
+        name: song
+        type: string
+      - description: Song releaseDate
+        in: query
+        name: releaseDate
+        type: string
+      - description: Song text
+        in: query
+        name: text
+        type: string
+      - description: Song link
+        in: query
+        name: link
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: get Filter Data Paginate
+      tags:
+      - songs
+swagger: "2.0"

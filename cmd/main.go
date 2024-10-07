@@ -5,6 +5,7 @@ import (
 	"app/pkg/handler"
 	"app/pkg/repository"
 	"app/pkg/service"
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -20,6 +21,7 @@ import (
 // @BasePath  /api
 
 func main() {
+	fmt.Println("Start work serever")
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	// INIT CONFIGS FROM ENV
