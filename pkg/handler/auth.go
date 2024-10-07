@@ -33,6 +33,11 @@ type Input struct {
 // @Produce  json
 // @Param page query int true "Page number"
 // @Param sizePage query int true "Number of items per page"
+// @Param group query string false "Song group"
+// @Param song query string false "Song name"
+// @Param releaseDate query string false "Song releaseDate"
+// @Param text query string false "Song text"
+// @Param link query string false "Song link"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
@@ -84,20 +89,35 @@ func (h *Handler) getFilterDataPaginate(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [get]
 func (h *Handler) getTextSongPaginate(c *gin.Context) {
-	var input Input
-	if err := c.BindJSON(&input); err != nil {
+	req := c.Request.URL.Query()
+
+	page, err := strconv.Atoi(req.Get("page"))
+	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	couplets, err := h.service.GetTextSongPaginate(input.ID, input.Page, input.SizePage)
+	sizePage, err := strconv.Atoi(req.Get("sizePage"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	id, err := strconv.Atoi(req.Get("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	couplets, err := h.service.GetTextSongPaginate(id, page, sizePage)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"page":     input.Page,
+		"id":       id,
+		"page":     page,
 		"couplets": couplets,
 	})
 }

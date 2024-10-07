@@ -205,6 +205,26 @@ paths:
         name: sizePage
         required: true
         type: integer
+      - description: Song group
+        in: query
+        name: group
+        type: string
+      - description: Song name
+        in: query
+        name: song
+        type: string
+      - description: Song releaseDate
+        in: query
+        name: releaseDate
+        type: string
+      - description: Song text
+        in: query
+        name: text
+        type: string
+      - description: Song link
+        in: query
+        name: link
+        type: string
       produces:
       - application/json
       responses:
