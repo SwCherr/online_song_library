@@ -9,8 +9,8 @@ import (
 type Authorization interface {
 	GetFilterData(song app.Song) ([]app.Song, error)
 	GetTextSong(id int) (string, error)
-	DeleteSong(song app.Song) error
-	UpdateSong(song app.Song) (int, error)
+	DeleteSongByID(id int) error
+	UpdateSongByID(song app.Song) error
 	PostNewSong(song app.Song) (int, error)
 }
 

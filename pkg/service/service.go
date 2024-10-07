@@ -8,8 +8,8 @@ import (
 type Authorization interface {
 	GetFilterDataPaginate(page int, sizePage int, song app.Song) ([]app.Song, error)
 	GetTextSongPaginate(id int, page int, sizePage int) ([]string, error)
-	DeleteSong(song app.Song) error
-	UpdateSong(song app.Song) (int, error)
+	DeleteSongByID(id int) error
+	UpdateSongByID(song app.Song) error
 	PostNewSong(song app.Song) (int, error)
 }
 

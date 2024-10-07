@@ -127,26 +127,23 @@ func (h *Handler) getTextSongPaginate(c *gin.Context) {
 // @Tags song
 // @Accept  json
 // @Produce  json
-// @Param page query int true "Page number"
-// @Param sizePage query int true "Number of items per page"
-// @Param song body app.Song.Info true "Song main information"
+// @Param id query int true "id song"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [delete]
-func (h *Handler) deleteSong(c *gin.Context) {
-	var song app.Song
-	if err := c.BindJSON(&song.Info); err != nil {
+func (h *Handler) deleteSongByID(c *gin.Context) {
+	req := c.Request.URL.Query()
+	id, err := strconv.Atoi(req.Get("id"))
+	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	err := h.service.DeleteSong(song)
-	if err != nil {
+	if err := h.service.DeleteSongByID(id); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
@@ -155,29 +152,24 @@ func (h *Handler) deleteSong(c *gin.Context) {
 // @Tags song
 // @Accept  json
 // @Produce  json
-// @Param page query int true "Page number"
-// @Param sizePage query int true "Number of items per page"
-// @Param song body app.Song.Info true "Song main information"
+// @Param song body app.Song true "Song information for update"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [patch]
-func (h *Handler) updateSong(c *gin.Context) {
+func (h *Handler) updateSongByID(c *gin.Context) {
 	var song app.Song
 	if err := c.BindJSON(&song.Info); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	id, err := h.service.UpdateSong(song)
-	if err != nil {
+	if err := h.service.UpdateSongByID(song); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
 // @Summary postNewSong

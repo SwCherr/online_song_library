@@ -26,8 +26,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.GET("/songs", h.getFilterDataPaginate)
 		auth.GET("/song", h.getTextSongPaginate)
-		auth.DELETE("/song", h.deleteSong)
-		auth.PATCH("/song", h.updateSong)
+		auth.DELETE("/song", h.deleteSongByID)
+		auth.PATCH("/song", h.updateSongByID)
 		auth.POST("/song", h.postNewSong)
 	}
 	return router

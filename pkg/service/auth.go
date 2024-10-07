@@ -41,12 +41,12 @@ func (s *AuthService) GetTextSongPaginate(id int, page int, sizePage int) ([]str
 	return couplets[start:end], nil
 }
 
-func (s *AuthService) DeleteSong(song app.Song) error {
-	return s.repo.DeleteSong(song)
+func (s *AuthService) DeleteSongByID(id int) error {
+	return s.repo.DeleteSongByID(id)
 }
 
-func (s *AuthService) UpdateSong(song app.Song) (int, error) {
-	return s.repo.UpdateSong(song)
+func (s *AuthService) UpdateSongByID(song app.Song) error {
+	return s.repo.UpdateSongByID(song)
 }
 
 func (s *AuthService) PostNewSong(song app.Song) (int, error) {
