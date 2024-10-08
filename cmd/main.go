@@ -5,7 +5,6 @@ import (
 	"app/pkg/handler"
 	"app/pkg/repository"
 	"app/pkg/service"
-	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -16,18 +15,12 @@ import (
 // @title           Online song library API
 // @version         1.0
 // @description     API server for online song library
-
 // @host      localhost:8000
 // @BasePath  /api
 
 func main() {
-	fmt.Println("Start work serever")
-	logrus.SetFormatter(new(logrus.JSONFormatter))
-
-	// INIT CONFIGS FROM ENV
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("error loading env variable: %s", err.Error())
-	}
+	settingLogs()
+	initVariableENV()
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     os.Getenv("DB_HOST"),
@@ -42,6 +35,8 @@ func main() {
 		logrus.Fatalf("failed to initialization DB: %s", err.Error())
 	}
 
+	logrus.Info("DB is initializate")
+
 	repository := repository.NewRepository(db)
 	service := service.NewService(repository)
 	handler := handler.NewHandler(service)
@@ -50,4 +45,29 @@ func main() {
 	if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
 		logrus.Fatalf("error ocurred while running HTTP server: %s", err.Error())
 	}
+
+	logrus.Info("Server is run")
+}
+
+func settingLogs() {
+	err := os.Mkdir("logs", 0777)
+	if err != nil {
+		logrus.Info("error created dir for logs: ", err.Error())
+	}
+
+	file, err := os.OpenFile("logs/logrus.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err == nil {
+		logrus.SetOutput(file)
+	} else {
+		logrus.Info("Failed to log to file, using default stderr")
+	}
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+}
+
+func initVariableENV() {
+	// INIT CONFIGS FROM ENV
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("error loading env variable: %s", err.Error())
+	}
+	logrus.Info("loaded ENV variable")
 }

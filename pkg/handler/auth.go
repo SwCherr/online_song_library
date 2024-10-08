@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type AllInput struct {
@@ -48,12 +49,14 @@ func (h *Handler) getFilterDataPaginate(c *gin.Context) {
 	page, err := strconv.Atoi(req.Get("page"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read page: ", err)
 		return
 	}
 
 	sizePage, err := strconv.Atoi(req.Get("sizePage"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read size page: ", err)
 		return
 	}
 
@@ -67,8 +70,11 @@ func (h *Handler) getFilterDataPaginate(c *gin.Context) {
 	songs, err := h.service.GetFilterDataPaginate(page, sizePage, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error get filter data paginate: ", err)
 		return
 	}
+
+	logrus.Info("get data by filters paginate: OK")
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"page":  req["page"],
@@ -94,26 +100,32 @@ func (h *Handler) getTextSongPaginate(c *gin.Context) {
 	page, err := strconv.Atoi(req.Get("page"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read page: ", err)
 		return
 	}
 
 	sizePage, err := strconv.Atoi(req.Get("sizePage"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read size page: ", err)
 		return
 	}
 
 	id, err := strconv.Atoi(req.Get("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read id: ", err)
 		return
 	}
 
 	couplets, err := h.service.GetTextSongPaginate(id, page, sizePage)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error get text song paginate: ", err)
 		return
 	}
+
+	logrus.Info("get text song paginate: OK")
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id":       id,
@@ -137,13 +149,17 @@ func (h *Handler) deleteSongByID(c *gin.Context) {
 	id, err := strconv.Atoi(req.Get("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read id: ", err)
 		return
 	}
 
 	if err := h.service.DeleteSongByID(id); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error ddelete song by id: ", err)
 		return
 	}
+
+	logrus.Info("delete song by id: OK")
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
@@ -152,23 +168,26 @@ func (h *Handler) deleteSongByID(c *gin.Context) {
 // @Tags song
 // @Accept  json
 // @Produce  json
-// @Param song body app.Song true "Song information for update"
+// @Param song body app.Song true "Song Errorrmation for update"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [patch]
 func (h *Handler) updateSongByID(c *gin.Context) {
 	var song app.Song
-	if err := c.BindJSON(&song.Info); err != nil {
+	if err := c.BindJSON(&song); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read Error song: ", err)
 		return
 	}
 
 	if err := h.service.UpdateSongByID(song); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error update song by id: ", err)
 		return
 	}
 
+	logrus.Info("update song by id: OK")
 	c.JSON(http.StatusOK, map[string]interface{}{})
 }
 
@@ -184,29 +203,33 @@ func (h *Handler) updateSongByID(c *gin.Context) {
 // @Router /song [post]
 func (h *Handler) postNewSong(c *gin.Context) {
 	var song app.Song
-	if err := c.BindJSON(&song.Info); err != nil {
+	if err := c.BindJSON(&song); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		logrus.Error("error read Error song: ", err)
 		return
 	}
 
-	err := getFullInfo(&song)
+	err := getFullError(&song)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error get full Error from third party API: ", err)
 		return
 	}
 
 	id, err := h.service.PostNewSong(song)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		logrus.Error("error post song by id: ", err)
 		return
 	}
 
+	logrus.Info("post new song: OK")
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
 
-func getFullInfo(song *app.Song) error {
+func getFullError(song *app.Song) error {
 	// --- uncomment for release ---
 	// str, err := requestThirdPartyAPI(song)
 	// if err != nil {
@@ -226,7 +249,7 @@ func getFullInfo(song *app.Song) error {
 }
 
 func requestMockData() ([]byte, error) {
-	file, err := os.Open("mockInfoSong.txt")
+	file, err := os.Open("mockErrorSong.txt")
 	if err != nil {
 		return []byte{}, err
 	}
@@ -245,9 +268,9 @@ func requestThirdPartyAPI(song *app.Song) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	group := strings.ReplaceAll(song.Info.Group, " ", "+")
-	namesong := strings.ReplaceAll(song.Info.Song, " ", "+")
-	finalURL := "https://" + client.Host + "/info?group=" + group + "&song=" + namesong
+	group := strings.ReplaceAll(song.Group, " ", "+")
+	namesong := strings.ReplaceAll(song.Song, " ", "+")
+	finalURL := "https://" + client.Host + "/Error?group=" + group + "&song=" + namesong
 
 	resp, err := http.Get(finalURL)
 	if err != nil {
