@@ -5,7 +5,10 @@ import (
 	"app/pkg/handler"
 	"app/pkg/repository"
 	"app/pkg/service"
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -40,13 +43,29 @@ func main() {
 	repository := repository.NewRepository(db)
 	service := service.NewService(repository)
 	handler := handler.NewHandler(service)
-
 	srv := new(todo.Server)
-	if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
-		logrus.Fatalf("error ocurred while running HTTP server: %s", err.Error())
+
+	go func() {
+		if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
+			logrus.Fatalf("error ocurred while running HTTP server: %s", err.Error())
+		}
+		logrus.Info("Server is run")
+	}()
+
+	// down without dropping any requests
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	logrus.Info("App is shutting down")
+
+	if err := srv.ShutDown(context.Background()); err != nil {
+		logrus.Errorf("error shutting down server: %s", err.Error())
 	}
 
-	logrus.Info("Server is run")
+	if err := db.Close(); err != nil {
+		logrus.Errorf("error shutting down database: %s", err.Error())
+	}
 }
 
 func settingLogs() {
@@ -65,7 +84,6 @@ func settingLogs() {
 }
 
 func initVariableENV() {
-	// INIT CONFIGS FROM ENV
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("error loading env variable: %s", err.Error())
 	}
