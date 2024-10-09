@@ -4,9 +4,17 @@ services:
   postgres: 
     image: postgres
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: qwerty
       POSTGRES_DB: online_song_library
+
   app: 
     build: .
+    ports:
+      - "8000:8000"
+    command: ["/bin/sh",  "/app/start_server.sh"]
+
+# /bin/sh ./start.sh

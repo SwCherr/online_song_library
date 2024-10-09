@@ -5,7 +5,7 @@ all: build run
 run:
 	./$(EXECUTABLE)
 
-build: swagInit
+build:
 	go build -o $(EXECUTABLE) cmd/main.go 
 
 dockerCompose:
@@ -13,11 +13,12 @@ dockerCompose:
 
 dockerStop:
 	docker-compose down
+	docker image rm online_song_library-app || true
 
 swagInit:
 	swag init -g cmd/main.go
 
 clean:
 	rm -rf ./$(EXECUTABLE)
-	rm -rf docs/
-	rm -rf logs/
+#	rm -rf docs/
+#	rm -rf logs/

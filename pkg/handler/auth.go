@@ -249,7 +249,7 @@ func getFullError(song *app.Song) error {
 }
 
 func requestMockData() ([]byte, error) {
-	file, err := os.Open("mockErrorSong.txt")
+	file, err := os.Open("mockInfoSong.txt")
 	if err != nil {
 		return []byte{}, err
 	}
