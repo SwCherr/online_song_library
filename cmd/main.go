@@ -1,11 +1,11 @@
 package main
 
 import (
-	todo "app"
-	"app/pkg/handler"
-	"app/pkg/repository"
-	"app/pkg/service"
 	"context"
+	"online_music/base"
+	"online_music/pkg/handler"
+	"online_music/pkg/repository"
+	"online_music/pkg/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,7 +43,7 @@ func main() {
 	repository := repository.NewRepository(db)
 	service := service.NewService(repository)
 	handler := handler.NewHandler(service)
-	srv := new(todo.Server)
+	srv := new(base.Server)
 
 	go func() {
 		if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
@@ -57,7 +57,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
 
-	logrus.Info("App is shutting down")
+	logrus.Info("online_music is shutting down")
 
 	if err := srv.ShutDown(context.Background()); err != nil {
 		logrus.Errorf("error shutting down server: %s", err.Error())

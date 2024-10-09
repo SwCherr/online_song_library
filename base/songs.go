@@ -1,4 +1,4 @@
-package app
+package base
 
 type Song struct {
 	Info

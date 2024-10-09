@@ -1,9 +1,9 @@
 package service
 
 import (
-	"app"
-	"app/pkg/repository"
 	"errors"
+	"online_music/base"
+	"online_music/pkg/repository"
 	"strings"
 )
 
@@ -15,15 +15,15 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) GetFilterDataPaginate(page int, sizePage int, song app.Song) ([]app.Song, error) {
+func (s *AuthService) GetFilterDataPaginate(page int, sizePage int, song base.Song) ([]base.Song, error) {
 	info, err := s.repo.GetFilterData(song)
 	if err != nil {
-		return []app.Song{}, err
+		return []base.Song{}, err
 	}
 
 	start, end, err := s.calculationStartEndPage(len(info), page, sizePage)
 	if err != nil {
-		return []app.Song{}, err
+		return []base.Song{}, err
 	}
 	return info[start:end], nil
 }
@@ -45,11 +45,11 @@ func (s *AuthService) DeleteSongByID(id int) error {
 	return s.repo.DeleteSongByID(id)
 }
 
-func (s *AuthService) UpdateSongByID(song app.Song) error {
+func (s *AuthService) UpdateSongByID(song base.Song) error {
 	return s.repo.UpdateSongByID(song)
 }
 
-func (s *AuthService) PostNewSong(song app.Song) (int, error) {
+func (s *AuthService) PostNewSong(song base.Song) (int, error) {
 	return s.repo.PostNewSong(song)
 }
 

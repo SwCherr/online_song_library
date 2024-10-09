@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"app/pkg/service"
+	"online_music/pkg/service"
 
-	_ "app/docs"
+	_ "online_music/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

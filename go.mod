@@ -1,4 +1,4 @@
-module app
+module online_music
 
 go 1.22.2
 

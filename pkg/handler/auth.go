@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"app"
 	"encoding/json"
 	"io"
+	"online_music/base"
 	"os"
 	"strconv"
 	"strings"
@@ -18,7 +18,7 @@ type AllInput struct {
 	ID       int `json:"id" binding:"required"`
 	Page     int `json:"page" binding:"required"`
 	SizePage int `json:"sizePage" binding:"required"`
-	app.Song
+	base.Song
 }
 
 type Input struct {
@@ -60,7 +60,7 @@ func (h *Handler) getFilterDataPaginate(c *gin.Context) {
 		return
 	}
 
-	var input app.Song
+	var input base.Song
 	input.Group = req.Get("group")
 	input.Song = req.Get("song")
 	input.Text = req.Get("text")
@@ -168,13 +168,13 @@ func (h *Handler) deleteSongByID(c *gin.Context) {
 // @Tags song
 // @Accept  json
 // @Produce  json
-// @Param song body app.Song true "Song Errorrmation for update"
+// @Param song body base.Song true "Song Errorrmation for update"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [patch]
 func (h *Handler) updateSongByID(c *gin.Context) {
-	var song app.Song
+	var song base.Song
 	if err := c.BindJSON(&song); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		logrus.Error("error read Error song: ", err)
@@ -196,13 +196,13 @@ func (h *Handler) updateSongByID(c *gin.Context) {
 // @Tags song
 // @Accept  json
 // @Produce  json
-// @Param song body app.Song true "New Song Data"
+// @Param song body base.Song true "New Song Data"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string "Invalid input body"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /song [post]
 func (h *Handler) postNewSong(c *gin.Context) {
-	var song app.Song
+	var song base.Song
 	if err := c.BindJSON(&song); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		logrus.Error("error read Error song: ", err)
@@ -229,7 +229,7 @@ func (h *Handler) postNewSong(c *gin.Context) {
 	})
 }
 
-func getFullError(song *app.Song) error {
+func getFullError(song *base.Song) error {
 	// --- uncomment for release ---
 	// str, err := requestThirdPartyAPI(song)
 	// if err != nil {
@@ -262,8 +262,8 @@ func requestMockData() ([]byte, error) {
 	return str, nil
 }
 
-func requestThirdPartyAPI(song *app.Song) ([]byte, error) {
-	client, err := app.NewClient()
+func requestThirdPartyAPI(song *base.Song) ([]byte, error) {
+	client, err := base.NewClient()
 	if err != nil {
 		return []byte{}, err
 	}

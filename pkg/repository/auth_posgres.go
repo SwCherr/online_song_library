@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"app"
 	"fmt"
+	"online_music/base"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,8 +16,8 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 }
 
 // group_name, song, release_date, text, link	var id int
-func (r *AuthPostgres) GetFilterData(song app.Song) ([]app.Song, error) {
-	var info []app.Song
+func (r *AuthPostgres) GetFilterData(song base.Song) ([]base.Song, error) {
+	var info []base.Song
 	query := fmt.Sprintf("SELECT * FROM %s "+
 		"WHERE group_name = COALESCE(NULLIF($1, ''), group_name) AND "+
 		"song = COALESCE(NULLIF($2, ''), song) AND "+
@@ -50,7 +50,7 @@ func (r *AuthPostgres) DeleteSongByID(id int) error {
 	return nil
 }
 
-func (r *AuthPostgres) UpdateSongByID(song app.Song) error {
+func (r *AuthPostgres) UpdateSongByID(song base.Song) error {
 	var id int
 	query := fmt.Sprintf("UPDATE %s "+
 		"SET group_name = COALESCE(NULLIF($1, ''), group_name), "+
@@ -68,7 +68,7 @@ func (r *AuthPostgres) UpdateSongByID(song app.Song) error {
 	return nil
 }
 
-func (r *AuthPostgres) PostNewSong(song app.Song) (int, error) {
+func (r *AuthPostgres) PostNewSong(song base.Song) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (group_name, song, release_date, text, link) values ($1, $2, $3, $4, $5) RETURNING id", songTable)
 	user_row := r.db.QueryRow(query, song.Group, song.Song, song.ReleaseDate, song.Text, song.Link)

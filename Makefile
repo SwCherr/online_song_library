@@ -2,18 +2,18 @@ EXECUTABLE=app
 
 all: build run
 
+install:
+	docker-compose up
+
+uninstall:
+	docker-compose down
+	docker image rm online_song_library-app || true
+
 run:
 	./$(EXECUTABLE)
 
 build:
 	go build -o $(EXECUTABLE) cmd/main.go 
-
-dockerCompose:
-	docker-compose up
-
-dockerStop:
-	docker-compose down
-	docker image rm online_song_library-app || true
 
 swagInit:
 	swag init -g cmd/main.go

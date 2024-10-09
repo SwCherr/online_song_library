@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"app"
+	"online_music/base"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
-	GetFilterData(song app.Song) ([]app.Song, error)
+	GetFilterData(song base.Song) ([]base.Song, error)
 	GetTextSong(id int) (string, error)
 	DeleteSongByID(id int) error
-	UpdateSongByID(song app.Song) error
-	PostNewSong(song app.Song) (int, error)
+	UpdateSongByID(song base.Song) error
+	PostNewSong(song base.Song) (int, error)
 }
 
 type Repository struct {
